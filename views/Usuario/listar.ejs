@@ -1,0 +1,508 @@
+<script src="/js/Usuario/listar.js"></script>
+<!--<script src="/js/Usuario/relatorio.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+<style>
+    body {
+        background-color: #36393f;
+        color: white;
+        font-family: Arial, sans-serif;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    table, th, td {
+        border: 1px solid #2c2f33;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #202225;
+        color: white;
+        font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+        background-color: #2c2f33;
+    }
+
+    tr:hover {
+        background-color: #4f5459;
+    }
+
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .extra-column {
+        font-weight: bold;
+        color: #43b581; /* cor verde (pode ajustar conforme necessário) */
+    }
+
+    /* Adicione a regra abaixo para garantir que o texto seja branco */
+    body {
+        color: white;
+    }
+    .table-horas td, .table-horas th {
+        padding: 5px;
+        font-size: 13px;
+    }
+
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #printArea, #printArea * {
+            visibility: visible;
+        }
+
+        #printArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+    }
+  </style>
+  <script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Obtendo o ID do usuário dos cookies
+    const userId = getCookie('userId');
+
+    // Selecionando o elemento do select
+    const selectUsuario = document.getElementById('usuario');
+
+
+    // Verificando se o ID do usuário foi encontrado nos cookies
+    if (userId) {
+        
+        // Definindo o valor do select com base no ID do usuário
+        selectUsuario.value = userId;
+
+        // Se o userId for 4, permite alterar o select, caso contrário, desabilita
+        if (userId != '4' && userId !=6) {
+            // Desabilitando o select para impedir alterações
+            selectUsuario.disabled = true;
+        }
+    }
+});
+
+// Função para obter o valor de um cookie pelo nome
+function getCookie(name) {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // Verifica se o cookie começa com o nome desejado
+        if (cookie.startsWith(name + '=')) {
+            // Retorna o valor do cookie sem o nome
+            return cookie.substring(name.length + 1);
+        }
+    }
+    return ''; // Retorna uma string vazia se o cookie não for encontrado
+}   
+
+    </script>
+<div>
+    <h1>Horas e Implantações</h1>
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="usuario">Usuario:</label>
+            <select class="form-control" id="usuario">
+                <option value="0">--Selecione--</option>
+                <option value="1">Mateus</option>
+                <option value="2">Carlos Muller</option>
+                <option value="3">Vinicius</option>
+                <option value="5">Guilherme</option>
+                <option value="7">Leonardo</option>
+                <option value="8">Edmilson</option>
+            </select>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="dia">Data Inicio:</label>
+            <input class="form-control" type="date" id="dia" />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="dia2">Data Fim:</label>
+            <input class="form-control" type="date" id="dia2" />
+        </div>
+    </div>
+    <div class="d-flex justify-content-end mb-3">
+        <a id="pesquisarBtn" class="btn btn-primary">Pesquisar</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-stripped">
+            <thead>
+                <th>Data</th>
+                <th>Entrada</th>
+                <th>Cafe</th>
+                <th>Cafe</th>
+                <th>Almoco</th>
+                <th>Almoco</th>
+                <th>Cafe</th>
+                <th>Cafe</th>
+                <th>Saida</th>
+                <th>Extra</th>
+            </thead>
+            <tbody></tbody> <!-- Adicionado o elemento tbody -->
+        </table>
+        <table id="tabelaImplantacoes">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Cidade</th>
+                    <th>Estado</th>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Observações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- As linhas da tabela de implantações serão adicionadas dinamicamente aqui -->
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-end mb-3">
+            <button id="exportarExcelBtn" class="btn btn-success">Exportar Horas para Excel</button>
+        </div>
+        <!-- Relatório de Distâncias 
+        <hr>
+        <h2>Relatório de Distâncias (KM)</h2>
+        <div id="relatorioViagensContainer" style="margin-bottom: 20px;">
+            <p><strong>Cidades Visitadas:</strong></p>
+            <ul id="listaCidadesVisitadas" style="list-style: inside; padding-left: 10px;"></ul>
+
+            <p><strong>Total de KM percorridos:</strong> <span id="totalKm">--</span> km</p>
+        </div>
+-->
+        <!-- Botão Exportar Implantações -->
+        <div class="d-flex justify-content-end mb-3">
+            <button id="exportarExcelBtn1" class="btn btn-success">Exportar Implantações para Excel</button>
+        </div>
+        <!-- Botões de impressão 
+        <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-info me-2" onclick="imprimirHoras()">Imprimir Horas</button>
+            <button class="btn btn-info" onclick="imprimirImplantacoes()">Imprimir Implantações</button>
+          </div>
+-->
+          <button class="btn btn-warning" onclick="enviarRelatorioEmail()">Enviar horas via E-mail</button>
+          <button class="btn btn-warning" onclick="enviarRelatorioEmailimp()">Enviar implantações via E-mail</button>
+
+    </div>
+    <!-- Área oculta para impressão -->
+<div id="printArea" style="display: none; background: white; color: black; padding: 20px; font-family: Arial;"></div>
+
+</div>
+<script>
+
+    //ENVIO DO EMAIL
+    function enviarRelatorioEmailimp() {
+    // --- Captura os valores do período ---
+    function formatarDataBrasileira(dataISO) {
+    const [ano, mes, dia] = dataISO.split("-");
+    return `${dia}/${mes}/${ano}`;
+}
+
+const diaInicioISO = document.getElementById('dia').value;
+const diaFimISO = document.getElementById('dia2').value;
+
+const diaInicio = formatarDataBrasileira(diaInicioISO);
+const diaFim = formatarDataBrasileira(diaFimISO);
+    // --- Pega o nome do usuário do cookie ---
+    const cookies = document.cookie.split(';').reduce((acc, c) => {
+        const [key, value] = c.trim().split('=');
+        acc[key] = decodeURIComponent(value);
+        return acc;
+    }, {});
+    const nomeUsuario = cookies['Nome'] || 'Usuário';
+
+    // --- Captura as tabelas ---
+    const tabelaImplantacoes = document.getElementById('tabelaImplantacoes');
+    const tabelaImplantacoesClone = tabelaImplantacoes.cloneNode(true);
+
+
+    // --- Estiliza as células das tabelas ---
+    tabelaImplantacoesClone.querySelectorAll('th, td').forEach(el => {
+        el.style.border = '1px solid #ddd';
+        el.style.padding = '8px';
+        el.style.textAlign = 'left';
+        el.style.fontFamily = 'Arial, sans-serif';
+    });
+
+    // --- Data e hora atual ---
+    const agora = new Date();
+    const dataHoraEnvio = agora.toLocaleString('pt-BR');
+
+    // --- Gera corpo do email ---
+    const corpoHtml = `
+        <h2>Implantações</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            ${tabelaImplantacoesClone.outerHTML}
+        </table>
+        <br/><hr style="margin-top: 40px;">
+        <p style="font-size: 12px; color: gray; text-align: right;">
+            Enviado por <strong>${nomeUsuario}</strong> em ${dataHoraEnvio}
+        </p>
+    `;
+
+    // --- Assunto do email ---
+    const assunto = `Implantações de ${nomeUsuario} - Período: ${diaInicio} a ${diaFim}`;
+
+    // --- Envio ---
+    const dados = {
+        to: 'adm@infomaster.inf.br',
+        subject: assunto,
+        html: corpoHtml,
+        usuid: getCookie('userId'),
+    };
+
+    fetch('http://85.31.231.194:8080/api/enviar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.mensagem || 'E-mail de implantações enviado com sucesso!');
+    })
+    .catch(error => {
+        console.error('Erro ao enviar o e-mail de implantações:', error);
+        alert('Erro ao enviar o e-mail.');
+    });
+}
+//ENVIAR IMPLANTAÇÕES POR EMAIL
+
+function enviarRelatorioEmail() {
+    // --- Captura os valores do período ---
+    function formatarDataBrasileira(dataISO) {
+    const [ano, mes, dia] = dataISO.split("-");
+    return `${dia}/${mes}/${ano}`;
+}
+
+const diaInicioISO = document.getElementById('dia').value;
+const diaFimISO = document.getElementById('dia2').value;
+
+const diaInicio = formatarDataBrasileira(diaInicioISO);
+const diaFim = formatarDataBrasileira(diaFimISO);
+    // --- Pega o nome do usuário do cookie ---
+    const cookies = document.cookie.split(';').reduce((acc, c) => {
+        const [key, value] = c.trim().split('=');
+        acc[key] = decodeURIComponent(value);
+        return acc;
+    }, {});
+    const nomeUsuario = cookies['Nome'] || 'Usuário';
+
+    // --- Captura as tabelas ---
+    const tabelaHoras = document.querySelector('table.table').outerHTML;
+
+    // --- Estiliza as células das tabelas ---
+    const tabelaHorasElement = document.createElement('div');
+    tabelaHorasElement.innerHTML = tabelaHoras;
+    tabelaHorasElement.querySelectorAll('th, td').forEach(el => {
+        el.style.border = '1px solid #ddd';
+        el.style.padding = '8px';
+        el.style.textAlign = 'left';
+        el.style.fontFamily = 'Arial, sans-serif';
+    });
+    // --- Data e hora atual ---
+    const agora = new Date();
+    const dataHoraEnvio = agora.toLocaleString('pt-BR');
+
+    // --- Gera corpo do email ---
+    const corpoHtml = `
+        <h2>Horas</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            ${tabelaHorasElement.innerHTML}
+        </table>
+        <br/><hr style="margin-top: 40px;">
+        <p style="font-size: 12px; color: gray; text-align: right;">
+            Enviado por <strong>${nomeUsuario}</strong> em ${dataHoraEnvio}
+        </p>
+    `;
+
+    // --- Assunto do email ---
+    const assunto = `Horas de ${nomeUsuario} - Período: ${diaInicio} a ${diaFim}`;
+
+    // --- Envio ---
+    const dados = {
+        to: 'adm@infomaster.inf.br',
+        subject: assunto,
+        html: corpoHtml,
+        usuid: getCookie('userId'),
+    };
+
+    fetch('http://85.31.231.194:8080/api/enviar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.mensagem || 'E-mail enviado com sucesso!');
+    })
+    .catch(error => {
+        console.error('Erro ao enviar o e-mail de horas:', error);
+        alert('Erro ao enviar o e-mail.');
+    });
+}
+
+
+
+        //PERIODOS DEFINIDOS
+    // Função para calcular o período baseado no fechamento
+    function calcularPeriodo() {
+        // Obtendo a data atual
+        const hoje = new Date();
+        let dataInicio, dataFim;
+
+        // Verifica se a data atual é antes ou depois do dia 21
+        if (hoje.getDate() < 21) {
+            // Se for antes do dia 21, o período vai de 21 do mês anterior até 20 do mês atual
+            hoje.setMonth(hoje.getMonth() - 1);  // Muda o mês para o anterior
+            dataInicio = new Date(hoje.getFullYear(), hoje.getMonth(), 21); // Dia 21 do mês anterior
+            hoje.setMonth(hoje.getMonth() + 1);  // Volta para o mês atual
+            dataFim = new Date(hoje.getFullYear(), hoje.getMonth(), 20); // Dia 20 do mês atual
+        } else {
+            // Se for depois do dia 21, o período vai de 21 do mês atual até 20 do próximo mês
+            dataInicio = new Date(hoje.getFullYear(), hoje.getMonth(), 21); // Dia 21 do mês atual
+            hoje.setMonth(hoje.getMonth() + 1);  // Muda para o próximo mês
+            dataFim = new Date(hoje.getFullYear(), hoje.getMonth(), 20); // Dia 20 do próximo mês
+        }
+
+        // Formatação para o formato "YYYY-MM-DD"
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        // Preenche os campos de data no formulário com as datas calculadas
+        document.getElementById('dia').value = formatDate(dataInicio);
+        document.getElementById('dia2').value = formatDate(dataFim);
+    }
+
+    // Chama a função para calcular o período assim que a página carregar
+    calcularPeriodo();
+
+    const printButton = document.createElement('button');
+    printButton.textContent = 'Imprimir';
+    printButton.classList.add('btn', 'btn-info');
+    document.body.appendChild(printButton);
+
+    printButton.addEventListener('click', function () {
+        // Obtendo o conteúdo das duas tabelas
+        const tabelaHoras = document.querySelector('table.table');
+        const tabelaImplantacoes = document.getElementById('tabelaImplantacoes');
+
+        // Criando um conteúdo HTML para impressão
+        let printContent = `
+            <h1>Relatório de Horas e Implantações</h1>
+            <h2>Horas</h2>
+            ${tabelaHoras.outerHTML}
+            <h2>Implantações</h2>
+            ${tabelaImplantacoes.outerHTML}
+        `;
+
+        // Criando uma nova janela para impressão
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write('<html><head><title>Impressão</title>');
+        printWindow.document.write('<style>body { font-family: Arial, sans-serif; color: black; } table { width: 100%; border-collapse: collapse; margin-bottom: 20px; } table, th, td { border: 1px solid #000; } th, td { padding: 10px; text-align: center; } th { background-color: #f2f2f2; font-weight: bold; } tr:nth-child(even) { background-color: #f9f9f9; } tr:hover { background-color: #e0e0e0; } </style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(printContent);
+        printWindow.document.write('</body></html>');
+
+        // Aguardando o conteúdo ser carregado e, em seguida, disparando a impressão
+        printWindow.document.close();
+        printWindow.print();
+    });
+    function getUsuarioNome() {
+    const select = document.getElementById('usuario');
+    return select.options[select.selectedIndex].text;
+}
+
+function imprimirHoras() {
+    const usuarioNome = getUsuarioNome();
+
+    const horasTable = document.querySelector('.table.table-stripped').outerHTML;
+            // Criação de um objeto Date para pegar a data e hora atuais
+            const data = new Date();
+
+            // Formatar data e hora no formato desejado (ex: "dd/mm/yyyy hh:mm:ss")
+            const dataehora = `${String(data.getDate()).padStart(2, '0')}/${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()} ${String(data.getHours()).padStart(2, '0')}:${String(data.getMinutes()).padStart(2, '0')}:${String(data.getSeconds()).padStart(2, '0')}`;
+
+    const printContent = `
+        <h2 style="text-align:center;">Banco de horas</h2>
+        <h2 style ="text-align:center;">Colaborador:${usuarioNome}</>
+        ${horasTable}
+        <p style="text-align:center;">Impresso ${dataehora}</p>
+    `;
+
+    mostrarEImprimir(printContent);
+}
+
+function imprimirImplantacoes() {
+    const usuarioNome = getUsuarioNome();
+
+    const implantacoesTable = document.getElementById('tabelaImplantacoes').outerHTML;
+        // Criação de um objeto Date para pegar a data e hora atuais
+        const data = new Date();
+
+        // Formatar data e hora no formato desejado (ex: "dd/mm/yyyy hh:mm:ss")
+        const dataehora = `${String(data.getDate()).padStart(2, '0')}/${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()} ${String(data.getHours()).padStart(2, '0')}:${String(data.getMinutes()).padStart(2, '0')}:${String(data.getSeconds()).padStart(2, '0')}`;
+
+    const printContent = `
+        <h2 style="text-align:center;">Implantações</h2>
+        <h2 style ="text-align:center;">Colaborador:${usuarioNome}</>
+        ${implantacoesTable}
+        <p style="text-align:center;">Impresso ${dataehora}</p>
+    `;
+
+    mostrarEImprimir(printContent);
+}
+
+function mostrarEImprimir(html) {
+    const printArea = document.getElementById('printArea');
+    printArea.innerHTML = html;
+    printArea.style.display = 'block';
+
+    window.print();
+
+    printArea.innerHTML = '';
+    printArea.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const userId = getCookie('userId');
+    
+    // Oculta os botões de ação se o userId for 6
+    if (userId === '6') {
+        // Esconde todas as colunas e botões com base na classe 'btn-acao'
+        document.querySelectorAll('.btn-acao').forEach(btn => {
+            btn.style.display = 'none';
+        });
+
+        // Opcional: Esconde o cabeçalho da coluna "Ações" também
+        const acoesHeader = document.querySelector('#tabelaImplantacoes th:nth-child(7)');
+        if (acoesHeader) {
+            acoesHeader.style.display = 'none';
+        }
+
+        // Esconde as células da coluna "Ações" nas linhas
+        document.querySelectorAll('#tabelaImplantacoes tbody tr').forEach(row => {
+            const cell = row.cells[6];
+            if (cell) {
+                cell.style.display = 'none';
+            }
+        });
+    }
+});
+</script>

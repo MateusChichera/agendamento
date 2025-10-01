@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agendamentos</title>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <link rel="stylesheet" href="/css/fontawesome/all.min.css">
+  <link rel="stylesheet" href="/css/template/adminlte.min.css">
+  <style>
+    /* Mantenha apenas esses estilos */
+    .main-header, .main-footer {
+      background-color: #343a40 !important;
+    }
+
+    .main-sidebar {
+      background-color: #343a40 !important;
+    }
+
+    .content-wrapper {
+      background-color: #2c3b41;
+      padding-top: 20px;
+    }
+
+    .card {
+      background-color: #2c3b41;
+    }
+
+    .card-body {
+      background-color: #ffffff;
+    }
+
+    /* Estilo do modal de email (manter) */
+    #modalEmail {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    #modalEmail .modal-content {
+      background: #fff;
+      color: #333;
+      padding: 20px 20px 30px 20px;
+      max-width: 400px;
+      margin: 10% auto;
+      border-radius: 8px;
+      position: relative;
+      font-family: Arial, sans-serif;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    #modalEmail h3 {
+      margin-top: 0;
+      color: #444;
+    }
+
+    #modalEmail label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    #modalEmail input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    #modalEmail button {
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #modalEmail button:hover {
+      background-color: #0056b3;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      color: red;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+/* Seu CSS existente */
+  .navbar-badge {
+    font-size: 0.7rem;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+
+  /* Estilos para o popup de mensagens (ajustados para Dark Mode) */
+  #popupMensagens {
+    display: none; /* Controlado por JS, mas com default aqui */
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    width: 320px;
+    background-color: #2c3e50; /* Fundo mais escuro para o popup (azul petróleo/cinza escuro) */
+    color: #ecf0f1; /* Texto claro para o popup */
+    border: 1px solid #34495e; /* Borda mais escura */
+    border-radius: 0.5rem;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4); /* Sombra mais intensa para dark mode */
+    z-index: 10000;
+    padding: 1rem;
+    font-size: 0.875rem;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+
+  #popupMensagens h4 {
+      color: #ecf0f1; /* Garante que o título seja claro */
+  }
+
+  /* Estilo para o botão "Marcar como lidas" */
+  #fecharPopup {
+  padding: 0.5rem 1rem;
+  background-color: #1f2937; /* gray-800 */
+  color: white;
+  border: none;
+  border-radius: 1rem; /* bordas bem arredondadas */
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 600; /* font-semibold */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#fecharPopup:hover {
+  background-color: #374151; /* gray-700 */
+}
+
+  /* Estilo para cada item de mensagem - Bolha de Mensagem (WhatsApp like) */
+  .mensagem-item {
+    background-color: #3a546d; /* Fundo da bolha de mensagem (um azul escuro) */
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2); /* Sombra sutil para a bolha */
+    position: relative;
+    color: #ecf0f1; /* Cor do texto da mensagem */
+  }
+
+  .mensagem-item p {
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .mensagem-item .nome-tecnico {
+    font-weight: bold;
+    color: #85e085; /* Cor do nome do técnico (um verde mais claro) */
+    margin-bottom: 0.25rem;
+  }
+
+  .mensagem-item .texto-resposta {
+    color: #ecf0f1; /* Garante que o texto da resposta seja claro */
+    margin-bottom: 0.5rem;
+  }
+
+  .mensagem-item .data-hora {
+    font-size: 0.7rem;
+    color: #95a5a6; /* Cor da data/hora (cinza claro) */
+    text-align: right;
+    display: block;
+    margin-top: 0.5rem;
+  }
+  
+  /* Estilo para a mensagem "Nenhuma mensagem nova." */
+  #mensagensConteudo p.text-gray-400 {
+      color: #95a5a6; /* Garante que essa mensagem seja visível no dark mode */
+  }
+  </style>
+</head>
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+<body class="hold-transition sidebar-mini layout-fixed dark-mode">
+<div class="wrapper">
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-dark">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+    </ul>
+ <ul class="navbar-nav ml-auto">
+  <li class="nav-item dropdown">
+    <a class="nav-link" href="#" id="sino">
+      <i class="fas fa-bell"></i>
+      <span id="badgeNotificacao" class="badge badge-danger navbar-badge" style="display: none;">●</span>
+    </a>
+  </li>
+</ul>
+
+<div id="popupMensagens">
+  <div class="flex justify-between items-center mb-3">
+    <h4 class="text-lg font-bold text-gray-100">Notificações</h4>
+    <button id="fecharPopup"
+  class="px-4 py-2 bg-gray-800 text-white rounded-2xl hover:bg-gray-700 transition-colors duration-200 text-sm font-semibold shadow-md">
+  Marcar como lidas
+</button>
+
+  </div>
+  <div id="mensagensConteudo">
+    <p class="text-gray-400 p-2">Nenhuma mensagem nova.</p>
+  </div>
+</div>
+
+  </nav>
+
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="/" class="brand-link" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+      <img src="/images/logobrancosemfundo.png" alt="Logo Infomaster" style="width: 80px; margin-top: 5px;">
+    </a>
+    
+    <a style="text-align: center;" href="/" class="brand-link">
+      <span id="nome" class="brand-text font-weight-light">Olá, </span>
+    </a>
+    <a href="#" id="btnDeslogar" class="nav-link" style="text-align: center;">
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="brand-text font-weight-light">Deslogar</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="info">
+          <a href="#" class="d-block"></a>
+        </div>
+      </div>
+
+      <!-- Sidebar Menu -->
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <li class="nav-item" id="menuItemInicio">
+            <a href="/" class="nav-link">
+              <i class="nav-icon fas fa-home"></i>
+              <p>Início</p>
+            </a>
+          </li>
+          <li class="nav-item" id="menuItemCadastrarHoras">
+            <a href="/usuarios/cadastrar" class="nav-link">
+              <i class="fas fa-user-plus"></i>
+              <p>Cadastrar Horas</p>
+            </a>
+          </li>
+          <li class="nav-item" id="agendamentoMenuItem">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-calendar-alt"></i>
+              <p>Agendamento <i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item" id="subMenuItemCadastrarAgendamento">
+                <a href="/usuarios/implantacoes" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Cadastrar</p>
+                </a>
+              </li>
+              <li class="nav-item" id="subMenuItemImportarAgendamento">
+                <a href="/usuarios/importar" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Importar</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item" id="menuItemHorasImplantacoes">
+            <a href="/usuarios" class="nav-link">
+              <i class="fas fa-file-alt"></i>
+              <p>Horas e Implantações</p>
+            </a>
+          </li>
+          <li class="nav-item" id="menuItemViagens">
+            <a href="/usuarios/viagem" class="nav-link">
+              <i class="fas fa-chart-bar"></i>
+              <p>Viagens</p>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <div style="margin:20px;" class="card card-body">
+      <%- body %>
+    </div>
+  </div>
+
+  <!-- Main Footer -->
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2025 Mateus Chichera.</strong>
+    All rights reserved.
+    <div class="float-right d-block">
+      <b>Version</b> 4.2.5
+      <a href="#" id="btnConfigEmail" title="Configurar E-mail" style="margin-left: 15px;">
+        <img src="https://cdn-icons-png.flaticon.com/512/2099/2099058.png" alt="Configurações" width="20" />
+      </a>
+      <a href="#" id="openWhatsappModal" title="Conectar WhatsApp" style="margin-left: 15px;">
+        <i class="fab fa-whatsapp" style="color: #25D366; font-size: 20px;"></i>
+      </a>
+    </div>
+  </footer>
+</div>
+
+<!-- Modal WhatsApp -->
+<div class="modal fade" id="whatsappModal" tabindex="-1" aria-labelledby="whatsappModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-header">
+        <h5 class="modal-title" id="whatsappModalLabel">Conecte-se ao WhatsApp</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <img id="whatsappQrCode" src="" alt="QR Code do WhatsApp" class="img-fluid" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Email -->
+<div id="modalEmail">
+  <div class="modal-content">
+    <span class="close-modal" onclick="document.getElementById('modalEmail').style.display='none'">&times;</span>
+    <h3>Configurar E-mail</h3>
+    <label>Usuário (e-mail):</label>
+    <input type="text" id="smtp_user" />
+    <label>Senha:</label>
+    <input type="password" id="smtp_pass" />
+    <button onclick="gravarEmailConfig()">Salvar</button>
+  </div>
+</div>
+
+<!-- REQUIRED SCRIPTS -->
+<script src="/js/jquery/jquery.min.js"></script>
+<script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/js/template/adminlte.min.js"></script>
+
+<script>
+  // Funções de cookie e permissões
+  document.addEventListener('DOMContentLoaded', function() {
+    function getCookie(name) {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + '=')) {
+          return cookie.substring(name.length + 1);
+        }
+      }
+      return '';
+    }
+
+    const userName = getCookie('Nome');
+    const nomeSpan = document.getElementById('nome');
+    if (userName) {
+      nomeSpan.textContent += userName + '!';
+    } else {
+      nomeSpan.textContent += '!';
+    }
+
+    // Verificação de permissões
+    const userId = getCookie('userId');
+    const menuItemIds = {
+      inicio: 'menuItemInicio',
+      cadastrarHoras: 'menuItemCadastrarHoras',
+      agendamento: 'agendamentoMenuItem',
+      subCadastrarAgendamento: 'subMenuItemCadastrarAgendamento',
+      subImportarAgendamento: 'subMenuItemImportarAgendamento',
+      horasImplantacoes: 'menuItemHorasImplantacoes',
+      viagens: 'menuItemViagens'
+    };
+
+    function verificarPermissoes() {
+      for (const key in menuItemIds) {
+        const element = document.getElementById(menuItemIds[key]);
+        if (element) element.style.display = 'none';
+      }
+
+      const inicioItem = document.getElementById(menuItemIds.inicio);
+      const horasImplantacoesItem = document.getElementById(menuItemIds.horasImplantacoes);
+      
+      if (inicioItem) inicioItem.style.display = 'block';
+      if (horasImplantacoesItem) horasImplantacoesItem.style.display = 'block';
+
+      if (userId == 1 || userId == 2 || userId == 3 || userId == 5 || userId == 7) {
+        const cadastrarHorasItem = document.getElementById(menuItemIds.cadastrarHoras);
+        if (cadastrarHorasItem) cadastrarHorasItem.style.display = 'block';
+      } else if (userId == 4) {
+        const agendamentoItem = document.getElementById(menuItemIds.agendamento);
+        const viagensItem = document.getElementById(menuItemIds.viagens);
+        
+        if (agendamentoItem) {
+          agendamentoItem.style.display = 'block';
+          const subCadastrarAgendamento = document.getElementById(menuItemIds.subCadastrarAgendamento);
+          const subImportarAgendamento = document.getElementById(menuItemIds.subImportarAgendamento);
+          if (subCadastrarAgendamento) subCadastrarAgendamento.style.display = 'block';
+          if (subImportarAgendamento) subImportarAgendamento.style.display = 'block';
+        }
+        if (viagensItem) viagensItem.style.display = 'block';
+      }
+    }
+
+    verificarPermissoes();
+
+    // Logout
+    function limparCookies() {
+      const dataExpiracao = new Date();
+      dataExpiracao.setFullYear(dataExpiracao.getFullYear() - 1);
+      const cookies = document.cookie.split(';');
+      cookies.forEach(cookie => {
+        const partes = cookie.split('=');
+        const nomeCookie = partes.shift().trim();
+        document.cookie = `${nomeCookie}=; expires=${dataExpiracao.toUTCString()}; path=/`;
+      });
+    }
+
+    const btnDeslogar = document.getElementById('btnDeslogar');
+    btnDeslogar.addEventListener('click', function(event) {
+      event.preventDefault();
+      limparCookies();
+      window.location.href = '/login';
+    });
+
+    // Configuração de email
+    const usuid = getCookie("userId");
+    const from_name = getCookie("Nome");
+
+    document.getElementById("btnConfigEmail").addEventListener("click", () => {
+      fetch(`http://85.31.231.194:8080/api/email/config/${usuid}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            document.getElementById("smtp_user").value = data[0].smtp_user || "";
+            document.getElementById("smtp_pass").value = data[0].smtp_pass || "";
+          } else {
+            document.getElementById("smtp_user").value = "";
+            document.getElementById("smtp_pass").value = "";
+          }
+          document.getElementById("modalEmail").style.display = "block";
+        })
+        .catch(err => {
+          alert("Erro ao buscar configuração de e-mail.");
+          console.error(err);
+        });
+    });
+
+    // WhatsApp QR Code
+    const openBtn = document.getElementById("openWhatsappModal");
+    const qrImage = document.getElementById("whatsappQrCode");
+    const modalEl = document.getElementById("whatsappModal");
+
+    if (openBtn && qrImage && modalEl) {
+      openBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        fetch("http://85.31.231.194:8080/whatsapp/qrcode-img", {
+          method: "GET",
+          credentials: "include"
+        })
+        .then(response => {
+          if (!response.ok) throw new Error('Erro ao carregar o QR Code');
+          return response.blob();
+        })
+        .then(blob => {
+          const imgUrl = URL.createObjectURL(blob);
+          qrImage.src = imgUrl;
+          const modal = new bootstrap.Modal(modalEl);
+          modal.show();
+        })
+        .catch(error => {
+          console.error('Erro ao carregar o QR Code:', error);
+        });
+      });
+    }
+  });
+
+  function gravarEmailConfig() {
+    const usuid = getCookie("userId");
+    const from_name = getCookie("Nome");
+    const smtp_user = document.getElementById("smtp_user").value;
+    const smtp_pass = document.getElementById("smtp_pass").value;
+
+    const payload = {
+      usuid: usuid,
+      smtp_host: "mx.infomaster.inf.br",
+      smtp_port: "587",
+      smtp_user: smtp_user,
+      smtp_pass: smtp_pass,
+      from_email: smtp_user,
+      from_name: from_name,
+      use_tls: true,
+      use_ssl: false
+    };
+
+    fetch("http://85.31.231.194:8080/api/email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert("Configuração salva com sucesso!");
+      document.getElementById("modalEmail").style.display = "none";
+    })
+    .catch(err => {
+      alert("Erro ao salvar configuração.");
+      console.error(err);
+    });
+  }
+
+document.addEventListener("DOMContentLoaded", function() {
+    function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+
+  const userId = getCookie("userId");
+
+  // Verifica se userId é diferente de 4
+  if (userId !== "4") {
+    const sino = document.getElementById("sino");
+    if (sino) {
+      sino.style.display = "none"; // Esconde o sino se não for user 4
+    }
+    console.log("Usuário não autorizado para ver notificações.");
+    return;
+  }
+
+    const badgeNotificacao = document.getElementById("badgeNotificacao");
+    const sino = document.getElementById("sino");
+    const mensagensConteudo = document.getElementById("mensagensConteudo");
+    const popupMensagens = document.getElementById("popupMensagens");
+    const fecharPopupBtn = document.getElementById("fecharPopup"); // Novo: Botão de fechar
+
+    let mensagensNaoLidas = []; // Armazenará todas as mensagens não lidas
+
+    // URLs das suas APIs
+    const API_URL_VERIFICAR = "http://85.31.231.194:8080/whatsapp/notificacoes";
+    const API_URL_MARCAR_LIDA = "http://85.31.231.194:8080/whatsapp/notificacoes/visualizada";
+    
+    // Função para buscar as mensagens não lidas no backend
+    async function buscarMensagensNaoLidas() {
+      try {
+       // console.log("Buscando mensagens não lidas...");
+        const response = await fetch(API_URL_VERIFICAR);
+        if (!response.ok) {
+          throw new Error(`Erro HTTP ao buscar notificações: ${response.status}`);
+        }
+        const data = await response.json();
+        //console.log("Dados recebidos da API de notificações:", data);
+
+        if (data.mensagens && data.mensagens.length > 0) {
+          // Verifica se há novas mensagens que ainda não estão na lista
+          const novasMensagens = data.mensagens.filter(
+            novaMsg => !mensagensNaoLidas.some(existenteMsg => existenteMsg.mensagem_id === novaMsg.mensagem_id)
+          );
+
+          if (novasMensagens.length > 0) {
+              mensagensNaoLidas = [...mensagensNaoLidas, ...novasMensagens]; // Adiciona as novas mensagens
+              badgeNotificacao.style.display = "inline"; // Mostra a bolinha vermelha
+             // console.log(`Bolinha de notificação exibida. ${mensagensNaoLidas.length} mensagens não lidas.`);
+              // Renderiza as mensagens no popup imediatamente após a busca,
+              // garantindo que o conteúdo esteja atualizado se o popup estiver aberto ou for aberto.
+              renderizarMensagensNoPopup(); 
+          }
+        } else {
+          // Se o backend não retornar mensagens, limpa a lista e esconde a bolinha
+          mensagensNaoLidas = []; 
+          badgeNotificacao.style.display = "none"; 
+         // console.log("Nenhuma nova mensagem não lida encontrada.");
+          // Se o popup estiver aberto e não houver mais mensagens, atualiza o conteúdo
+          if (popupMensagens.style.display === 'block') {
+              renderizarMensagensNoPopup();
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao buscar mensagens não lidas:", error);
+        badgeNotificacao.style.display = "none"; 
+        renderizarMensagensNoPopup(); // Garante que o popup seja limpo em caso de erro
+      }
+    }
+
+    // Função para renderizar as mensagens no popup
+    function renderizarMensagensNoPopup() {
+      mensagensConteudo.innerHTML = ''; // Limpa o conteúdo anterior
+
+      if (mensagensNaoLidas.length > 0) {
+        mensagensNaoLidas.forEach(msg => {
+          const dataFormatada = new Date(msg.data_resposta).toLocaleString('pt-BR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          });
+          const mensagemHtml = `
+            <div class="mensagem-item">
+              <p class="nome-tecnico">${msg.usunome}</p>
+              <p class="texto-resposta">${msg.resposta_texto}</p>
+              <p class="data-hora">${dataFormatada}</p>
+            </div>
+          `;
+          mensagensConteudo.insertAdjacentHTML('beforeend', mensagemHtml);
+        });
+      } else {
+        mensagensConteudo.innerHTML = '<p class="text-gray-600 p-2">Nenhuma mensagem nova.</p>';
+      }
+    }
+
+    // Função para marcar as mensagens como lidas no backend
+    async function marcarMensagensComoLidas() {
+      if (mensagensNaoLidas.length === 0) {
+        //console.log("Nenhuma mensagem para marcar como lida.");
+        return;
+      }
+
+      //console.log("Marcando mensagens como lidas no backend...");
+      // Itera sobre as mensagens e envia uma requisição POST para cada ID
+      for (const msg of mensagensNaoLidas) {
+        try {
+          const response = await fetch(API_URL_MARCAR_LIDA, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              // 'Authorization': `Bearer ${token}` // Descomente se tiver autenticação
+            },
+            body: JSON.stringify({ mensagemId: msg.mensagem_id }) // Envia o ID da mensagem
+          });
+          if (!response.ok) {
+            throw new Error(`Erro ao marcar mensagem ${msg.mensagem_id} como lida: ${response.status}`);
+          }
+          console.log(`Mensagem ${msg.mensagem_id} marcada como lida no backend.`);
+        } catch (error) {
+          console.error(`Erro ao marcar mensagem ${msg.mensagem_id} como lida:`, error);
+        }
+      }
+      
+      // Após marcar todas, limpa a lista no frontend e esconde a bolinha
+      mensagensNaoLidas = []; 
+      badgeNotificacao.style.display = "none"; 
+      renderizarMensagensNoPopup(); // Atualiza o popup para mostrar "Nenhuma mensagem nova."
+      
+      // Força uma nova busca imediatamente para garantir que o estado esteja atualizado
+      // Isso é importante para que a bolinha suma se não houver mais mensagens
+      buscarMensagensNaoLidas(); 
+    }
+
+    // Evento de clique no sino
+    sino.addEventListener("click", function () {
+      const isPopupVisible = popupMensagens.style.display === 'block';
+
+      if (isPopupVisible) {
+        // Se o popup está visível, esconde
+        popupMensagens.style.display = 'none';
+      } else {
+        // Se o popup está escondido, mostra e renderiza as mensagens atuais
+        renderizarMensagensNoPopup(); // Garante que o conteúdo mais recente seja exibido
+        popupMensagens.style.display = 'block';
+        // A função marcarMensagensComoLidas() NÃO É CHAMADA AQUI.
+        // Ela será chamada pelo botão "Fechar" do popup.
+      }
+    });
+
+    // Evento de clique no novo botão "Fechar" do popup
+    fecharPopupBtn.addEventListener("click", function() {
+        marcarMensagensComoLidas(); // Marca as mensagens como lidas
+        popupMensagens.style.display = 'none'; // Esconde o popup
+    });
+
+    // Opcional: Fechar o popup ao clicar fora dele
+    document.addEventListener("click", function(event) {
+      // Verifica se o clique não foi no sino, nem dentro do popup, nem no botão de fechar
+      if (!sino.contains(event.target) && !popupMensagens.contains(event.target) && event.target !== fecharPopupBtn) {
+        popupMensagens.style.display = 'none';
+      }
+    });
+
+    // === POLING: Configura a verificação periódica ===
+    // Chama a função de busca uma vez ao carregar a página
+    buscarMensagensNaoLidas();
+    // E depois a cada 5 segundos (5000 milissegundos)
+    setInterval(buscarMensagensNaoLidas, 5000); 
+  });
+
+</script>
+</body>
+</html>

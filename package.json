@@ -1,0 +1,46 @@
+{
+  "homepage": "https://mateuschichera.github.io/BANCO-DE-HORAS",
+  "dependencies": {
+    "@ngrok/ngrok": "^0.9.1",
+    "@whiskeysockets/baileys": "^6.17.16",
+    "axios": "^1.8.4",
+    "bcrypt": "^5.1.1",
+    "build": "^0.1.4",
+    "cookie-parser": "^1.4.6",
+    "cookies-parser": "^1.2.0",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "crypto-js": "^4.2.0",
+    "ejs": "^3.1.9",
+    "express": "^4.21.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.0",
+    "express-status-monitor": "^1.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
+    "mysql2": "^3.6.0",
+    "netlify-cli": "^23.8.0",
+    "netlify-lambda": "^0.4.0",
+    "node-cron": "^4.1.0",
+    "nodemailer": "^6.10.1",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "path": "^0.12.7",
+    "process": "^0.11.10",
+    "puppeteer": "^24.22.3",
+    "puppeteer-core": "^24.7.2",
+    "qrcode": "^1.5.4",
+    "serverless-http": "2.7.0",
+    "session": "^0.1.0",
+    "xlsx": "^0.18.5"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "build": "npm install",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages"
+  }
+}
