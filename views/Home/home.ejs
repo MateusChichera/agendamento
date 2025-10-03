@@ -122,7 +122,7 @@
         const primeiroDia = new Date(ano, mes - 1, 1).toISOString().split('T')[0];  // mês é 0-indexed
         const ultimoDia = new Date(ano, mes, 0).toISOString().split('T')[0]; // Último dia do mês
         const userId = getCookie('userId');
-        if(userId != 4){
+        if(userId != 4 && userId != 11){
          // alert("Usuário não autorizado a acessar o calendário.");
           return;
         }
