@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
             console.log('ID capturado:', id);
     
-            const url = `http://85.31.231.194:8080/usuarios/detalhes/${id}`;
+            const url = `http://agendamento.infomaster.inf.br:8080/usuarios/detalhes/${id}`;
             const resposta = await fetch(url);
             const dados = await resposta.json();
             if (resposta.ok) {

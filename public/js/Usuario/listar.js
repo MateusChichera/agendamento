@@ -204,7 +204,7 @@ if (userId == "6") {
             // Exibe um diálogo de confirmação antes de excluir
             if (confirm("Tem certeza que deseja excluir este item?")) {
                 var currentUrl = new URL(window.location.href);
-                fetch('http://85.31.231.194:8080/usuarios/excluir', {
+                fetch('http://agendamento.infomaster.inf.br:8080/usuarios/excluir', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -444,7 +444,7 @@
     const from_name = getCookie("Nome");
 
     document.getElementById("btnConfigEmail").addEventListener("click", () => {
-      fetch(`http://85.31.231.194:8080/api/email/config/${usuid}`)
+      fetch(`http://agendamento.infomaster.inf.br:8080/api/email/config/${usuid}`)
         .then(res => res.json())
         .then(data => {
           if (data && data.length > 0) {
@@ -470,7 +470,7 @@
     if (openBtn && qrImage && modalEl) {
       openBtn.addEventListener("click", function(e) {
         e.preventDefault();
-        fetch("http://85.31.231.194:8080/whatsapp/qrcode-img", {
+        fetch("http://agendamento.infomaster.inf.br:8080/whatsapp/qrcode-img", {
           method: "GET",
           credentials: "include"
         })
@@ -509,7 +509,7 @@
       use_ssl: false
     };
 
-    fetch("http://85.31.231.194:8080/api/email", {
+    fetch("http://agendamento.infomaster.inf.br:8080/api/email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -553,8 +553,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let mensagensNaoLidas = []; // Armazenará todas as mensagens não lidas
 
     // URLs das suas APIs
-    const API_URL_VERIFICAR = "http://85.31.231.194:8080/whatsapp/notificacoes";
-    const API_URL_MARCAR_LIDA = "http://85.31.231.194:8080/whatsapp/notificacoes/visualizada";
+    const API_URL_VERIFICAR = "http://agendamento.infomaster.inf.br:8080/whatsapp/notificacoes";
+    const API_URL_MARCAR_LIDA = "http://agendamento.infomaster.inf.br:8080/whatsapp/notificacoes/visualizada";
     
     // Função para buscar as mensagens não lidas no backend
     async function buscarMensagensNaoLidas() {

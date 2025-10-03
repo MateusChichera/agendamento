@@ -9,7 +9,7 @@ class MonitorRoute {
     }
 
     initializeRoutes() {
-        const BASE_URL = 'http://85.31.231.194:8080'; // << IP da sua VM
+        const BASE_URL = 'http://agendamento.infomaster.inf.br:8080'; // << IP da sua VM
         const rotas = [
             { nome: 'Home', url: `${BASE_URL}/` },
             { nome: 'Login', url: `${BASE_URL}/login` },

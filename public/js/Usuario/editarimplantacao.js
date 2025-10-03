@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     // ID da implantação, que será usado para buscar os dados
     let idimplantacao = localStorage.getItem('idimplantacao');
-    let currentUrl = `http://85.31.231.194:8080/usuarios/editar/viagem/${idimplantacao}`; // URL para buscar os dados da implantação
+    let currentUrl = `http://agendamento.infomaster.inf.br:8080/usuarios/editar/viagem/${idimplantacao}`; // URL para buscar os dados da implantação
 
     // Função para preencher o formulário com os dados da implantação
     async function preencherFormulario(implantacao) {
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         let idimplantacao = localStorage.getItem('idimplantacao');
-        let urlGravacao = `http://85.31.231.194:8080/usuarios/edt/viagem/${idimplantacao}`;
+        let urlGravacao = `http://agendamento.infomaster.inf.br:8080/usuarios/edt/viagem/${idimplantacao}`;
 
         fetch(urlGravacao, {
             method: 'POST',
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     alert("Alteração feita com sucesso, mensagem enviada",resposta.msg);
                     resetForm();
                     localStorage.removeItem('idimplantacao'); 
-                    window.location.href = "http://85.31.231.194:8080/usuarios/viagem";
+                    window.location.href = "http://agendamento.infomaster.inf.br:8080/usuarios/viagem";
                 } else {
                     alert(resposta.msg || 'Erro ao salvar');
                 }

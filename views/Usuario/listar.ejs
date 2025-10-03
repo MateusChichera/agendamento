@@ -264,7 +264,7 @@ const diaFim = formatarDataBrasileira(diaFimISO);
         usuid: getCookie('userId'),
     };
 
-    fetch('http://85.31.231.194:8080/api/enviar', {
+    fetch('http://agendamento.infomaster.inf.br:8080/api/enviar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados)
@@ -339,7 +339,7 @@ const diaFim = formatarDataBrasileira(diaFimISO);
         usuid: getCookie('userId'),
     };
 
-    fetch('http://85.31.231.194:8080/api/enviar', {
+    fetch('http://agendamento.infomaster.inf.br:8080/api/enviar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados)

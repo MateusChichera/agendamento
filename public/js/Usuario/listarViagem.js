@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let diaFim = document.getElementById("dia2").value;
 
         if (diaInicio && diaFim) {
-            let apiUrl = `http://85.31.231.194:8080/usuarios/agendamentos?dia=${diaInicio}&dia2=${diaFim}`;
+            let apiUrl = `http://agendamento.infomaster.inf.br:8080/usuarios/agendamentos?dia=${diaInicio}&dia2=${diaFim}`;
 
             fetch(apiUrl, {
                 method: 'GET',
@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (idExclusao) {
             if (confirm("Tem certeza que deseja excluir esta implantação?")) {
                 console.log(idExclusao)
-                fetch('http://85.31.231.194:8080/usuarios/deletar', {
+                fetch('http://agendamento.infomaster.inf.br:8080/usuarios/deletar', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (idEdicao) {
                 // Monta a URL base corretamente até o domínio e adiciona o path fixo da rota
             
-                window.location.assign(`http://85.31.231.194:8080/usuarios/editar/viagem`);
+                window.location.assign(`http://agendamento.infomaster.inf.br:8080/usuarios/editar/viagem`);
                 
                 // Salva o ID no localStorage (caso queira recuperar depois)
                 localStorage.setItem('idimplantacao', idEdicao);
